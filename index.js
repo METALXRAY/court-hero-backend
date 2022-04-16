@@ -2,13 +2,14 @@ import express from "express";
 import bodyParser from "body-parser";
 import AwakeRouter from "./routers/awake.js";
 import NodesRouter from "./routers/nodes.js";
-import cookieParser from "cookie-parser";
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// app.use(cookieParser());
+// server status at root
+app.get("/", (req, res) => {
+  res.send("server is running");
+});
 
 // possible middleware here
 
@@ -16,7 +17,8 @@ app.use(bodyParser.json());
 app.use("/awake", AwakeRouter);
 app.use("/nodes", NodesRouter);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.all("*", (req, res) => res.sendStatus(404));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Listening on port ${PORT}`);
 });

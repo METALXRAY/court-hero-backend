@@ -11,14 +11,14 @@ const router = Router();
 router.get("/", async (req, res) => {
   console.log("get all nodes");
   const nodes = await getNodes();
-  return res.json(nodes);
+  return res.json({ data: nodes });
 });
 
 // get all nodes in a block
 router.get("/:block", async (req, res) => {
   const { block } = req.params;
   const nodes = await getNodesByBlock(block);
-  return res.json(nodes);
+  return res.json({ data: nodes });
 });
 
 // get all nodes in a block and index

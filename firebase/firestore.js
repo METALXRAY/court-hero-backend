@@ -6,18 +6,20 @@ import {
   setDoc,
   addDoc,
   getFirestore,
+  updateDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
 
 export const setAwake = async (id) => {
-  await setDoc(doc(db, "nodes", String(id)), {
+  await updateDoc(doc(db, "nodes", String(id)), {
     awake: true,
   });
 };
 
 export const setNotAwake = async (id) => {
-  await setDoc(doc(db, "nodes", String(id)), {
+  await updateDoc(doc(db, "nodes", String(id)), {
     awake: false,
   });
 };
@@ -28,32 +30,44 @@ export const getNodes = async () => {
   nodes.forEach((node) => {
     data.push(node.data());
   });
-  console.log(data);
-  return nodes.map((node) => node.data());
+  return nodes.docs.map((node) => node.data());
 };
 
 export const setNodeFree = async (id) => {
-  await setDoc(doc(db, "nodes", String(id)), {
+  await updateDoc(doc(db, "nodes", String(id)), {
+    people: false,
+  });
+  await addDoc(collection(db, `nodes/${id}/logs`), {
+    created_at: serverTimestamp(),
     people: false,
   });
 };
 
 export const setNodeBusy = async (id) => {
-  await setDoc(doc(db, "nodes", String(id)), {
+  await updateDoc(doc(db, "nodes", String(id)), {
+    people: true,
+  });
+  await addDoc(collection(db, `nodes/${id}/logs`), {
+    created_at: serverTimestamp(),
     people: true,
   });
 };
 
 export const getNodesByBlock = async (block) => {
   const nodes = await getDocs(collection(db, "nodes"));
-  return nodes.filter((node) => node.data().block === block);
+  return nodes.docs
+    .filter((node) => node.data().block === block)
+    .map((node) => node.data());
 };
 
 export const getNodesByBlockAndIndex = async (block, index) => {
   const nodes = await getDocs(collection(db, "nodes"));
-  return nodes.filter(
-    (node) => node.data().block === block && node.data().index === Number(index)
-  );
+  return nodes.docs
+    .filter(
+      (node) =>
+        node.data().block === block && node.data().index === Number(index)
+    )
+    .map((node) => node.data());
 };
 
 export const sendDetectionLog = async (nodeId, detected) => {

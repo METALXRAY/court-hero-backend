@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 // routes
 app.use("/awake", AwakeRouter);
 app.use("/nodes", NodesRouter);
+app.use("/loop", NodesRouter);
 
 app.all("*", (req, res) => res.sendStatus(404));
 const PORT = process.env.PORT || 8000;

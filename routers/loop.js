@@ -55,3 +55,5 @@ router.get("/stop", (req, res) => {
     res.sendStatus(500);
   }
 });
+
+export default router;

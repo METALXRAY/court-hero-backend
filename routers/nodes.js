@@ -3,12 +3,13 @@ import {
   getNodes,
   getNodesByBlock,
   getNodesByBlockAndIndex,
-} from "../firebase/firestore";
+} from "../firebase/firestore.js";
 
 const router = Router();
 
 // get all nodes
 router.get("/", async (req, res) => {
+  console.log("get all nodes");
   const nodes = await getNodes();
   return res.json(nodes);
 });
@@ -26,3 +27,5 @@ router.get("/:block/:index", async (req, res) => {
   const nodes = await getNodesByBlockAndIndex(block, index);
   return res.json(nodes);
 });
+
+export default router;

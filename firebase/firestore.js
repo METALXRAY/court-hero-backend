@@ -1,5 +1,12 @@
-import app from "./app";
-import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import app from "./app.js";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  addDoc,
+  getFirestore,
+} from "firebase/firestore";
 
 const db = getFirestore(app);
 
@@ -9,8 +16,19 @@ export const setAwake = async (id) => {
   });
 };
 
+export const setNotAwake = async (id) => {
+  await setDoc(doc(db, "nodes", String(id)), {
+    awake: false,
+  });
+};
+
 export const getNodes = async () => {
   const nodes = await getDocs(collection(db, "nodes"));
+  const data = [];
+  nodes.forEach((node) => {
+    data.push(node.data());
+  });
+  console.log(data);
   return nodes.map((node) => node.data());
 };
 
@@ -36,4 +54,14 @@ export const getNodesByBlockAndIndex = async (block, index) => {
   return nodes.filter(
     (node) => node.data().block === block && node.data().index === Number(index)
   );
+};
+
+export const sendDetectionLog = async (nodeId, detected) => {
+  await setDoc(doc(db, "nodes", String(nodeId)), {
+    people: detected,
+  });
+  await addDoc(collection(db, `nodes/${nodeId}/logs`), {
+    people: detected,
+    created_at: new Date().toISOString(),
+  });
 };
